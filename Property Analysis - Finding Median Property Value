@@ -1,0 +1,9 @@
+SELECT g.City,g.Suburb,p.MedianPropertyValue,d.CalendarYear,
+Power(1+0.06,1)*p.MedianPropertyValue as Value1Y,
+Power(1+0.06,5)*p.MedianPropertyValue as Value5Y,
+Power(1+0.06,10)*p.MedianPropertyValue as Value10Y
+from FactMedianPropertyValue p inner join DimGeography g on g.GeographyKey = p.GeographyKey 
+inner join DimDate d on d.DateKey = p.DateKey
+where g.Suburb like 'Vir%' and g.City = 'Darwin' and p.MedianPropertyValue = 470000
+GROUP BY p.MedianPropertyValue,g.City,g.Suburb,d.CalendarYear
+GO
