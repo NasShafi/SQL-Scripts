@@ -1,0 +1,85 @@
+/* To search a list of all property names and their property id’s for Owner Id: **** */
+
+SELECT Pro.Name AS PropertyName, Own.PropertyId AS PropertyId, Own.OwnerId As OwnerID
+FROM [Dbo].[Property] Pro
+INNER JOIN [Dbo].[OwnerProperty] Own
+ON Pro.Id = Own.PropertyId
+WHERE Own.OwnerId = ****
+
+/* To search the current home value for each property which has Owner Id : **** */
+
+SELECT Pro.Name AS PropertyName, Own.PropertyId AS PropertyId, Own.OwnerId As OwnerID, 
+Phv.Value AS HomeValue
+FROM [Dbo].[Property] Pro
+INNER JOIN [Dbo].[OwnerProperty] Own
+ON Pro.Id = Own.PropertyId
+INNER JOIN [Dbo].PropertyHomeValue Phv
+ON Phv.PropertyId = Own.PropertyId
+WHERE Own.OwnerId = 1426 AND Phv.IsActive = 1
+ORDER BY Pro.Name
+
+/*  For each property with Owner Id : ****, that returns the sum of all payments from start date to end date using rental payment amount, rental payment frequency, 
+tenant start date and tenant end date */
+
+SELECT P.Name AS PropertyName, P.Id AS PropertyID,
+CASE
+		WHEN Trt.Name ='Weekly' THEN
+(DATEDIFF(wk,Tp.StartDate,Tp.EndDate)*Prp.Amount)
+WHEN Trt.Name ='Fortnightly' THEN ((DATEDIFF(wk,Tp.StartDate,Tp.EndDate)/2)*Prp.Amount)
+	ELSE 
+(DATEDIFF(m,Tp.StartDate,Tp.EndDate)*Prp.Amount)
+END AS SumOfPayments, 
+	Trt.Name AS RentalPaymentFrequency, 
+	Prp.Amount AS RentalPaymentAmount, 
+	Tp.StartDate AS TenantStartDate, 
+	Tp.EndDate AS TenantEndDate
+	FROM Property AS P 
+	INNER JOIN OwnerProperty AS Op 
+	ON P.Id=Op.PropertyId
+	INNER JOIN PropertyRentalPayment AS Prp 
+	ON P.Id=Prp.PropertyId
+	INNER JOIN TargetRentType AS Trt 
+	ON Prp.FrequencyType=Trt.Id
+	INNER JOIN TenantProperty AS Tp 
+	ON P.Id=Tp.PropertyId
+WHERE Op.OwnerId=****
+
+/* For each property in with Owner ID : **** , search for the yield. */
+
+SELECT Pro.Name AS PropertyName, Own.PropertyId AS PropertyId, Own.OwnerId As OwnerID, Pf.Yield
+FROM [dbo].[Property] Pro
+INNER JOIN [dbo].[OwnerProperty] Own
+ON Pro.Id = Own.PropertyId
+INNER JOIN [Dbo].[PropertyFinance] Pf
+ON Pf.PropertyId = Pro.Id
+WHERE Own.OwnerId = ****
+
+/* For each property in with Owner ID : ****  search for all the jobs */
+
+SELECT J.JobDescription, Js.Status
+FROM [Dbo].[Job] J
+INNER JOIN [Dbo].[JobStatus] Js
+ON  Js.Id = J.JobStatusId
+WHERE J.JobStatusId = 1
+
+/* TO find out all property names, current tenants first and last names and rental payments per week/ fortnight/month for the properties with Owner ID : ****. */
+
+SELECT Pro.Name AS PropertyNames, Pr.FirstName AS [Tenant's FirstName], Pr.LastName AS [Tenant's LastName], 
+CASE
+ 		WHEN Tp.PaymentFrequencyId = 1 THEN 'Weekly'
+ 		WHEN Tp.PaymentFrequencyId = 2 THEN 'Fortnightly'
+ 		WHEN Tp.PaymentFrequencyId = 3 THEN 'Monthly'
+ 	END 'Rental Payments'
+FROM [Dbo].[Property] Pro
+INNER JOIN [Dbo].[OwnerProperty] Own
+ON Pro.Id = Own.PropertyId
+INNER JOIN [Dbo].[Person] Pr
+ON Pr.Id = Own.Id
+INNER JOIN [Dbo].[TenantProperty] Tp
+ON Own.PropertyId = Tp.PropertyId
+WHERE Own.OwnerId = ****
+
+
+
+
+
