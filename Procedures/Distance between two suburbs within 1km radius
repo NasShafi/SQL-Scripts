@@ -1,0 +1,15 @@
+DECLARE
+@GEO1 GEOGRAPHY,
+@LAT1 VARCHAR(10),
+@LONG1 VARCHAR(10)
+
+SET @LAT1='-38.3650170000'
+SET @LONG1='144.7659200000'
+
+SET @geo1= geography::Point(@LAT1, @LONG1, 4326)
+SELECT Distinct g.GeographyKey,g.Suburb,g.City,t.StopName,t.Mode,LEFT(CONVERT(VARCHAR,
+(@geo1.STDistance(geography::Point(ISNULL(t.Latitude,0), 
+ISNULL(t.Longitude,0), 4326)))/1000),5)+' Km' 
+as DISTANCE from DimGeography g INNER JOIN DimTransport t ON t.TransportKey = g.GeographyKey
+WHERE (@GEO1.STDistance(geography::Point(ISNULL(t.Latitude,0),
+ISNULL(t.Longitude,0), 4326)))/1000 < = 1
