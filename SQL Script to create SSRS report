@@ -1,0 +1,16 @@
+/* Script to display expense report for Property = "A" */
+
+SELECT P.FirstName AS 'Current Owner', Pro.Bedroom , Pro.Bathroom,
+A.Number + ' ' + A.Street AS 'Property address:', Pe.Amount, Pe.Date, Pe.Description,Prf.Amount AS 'Rental Payment'
+FROM Property Pro 
+INNER JOIN Address A 
+ON Pro.AddressId = A.AddressId 
+INNER JOIN PropertyExpense Pe 
+ON Pe.PropertyId = Pro.Id
+INNER JOIN [Dbo].[PropertyRentalPayment] Prf
+ON Prf.PropertyId = Pro.Id
+INNER JOIN [Dbo].[OwnerProperty] Op
+ON Op.PropertyId = Pro.Id
+INNER JOIN [Dbo].[Person] P
+ON P.Id = Op.OwnerId
+WHERE Pro.Name = 'Property A'
